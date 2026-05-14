@@ -1,0 +1,901 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kartu Soal – Dicoding Community</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Nunito:wght@600;800;900&display=swap");
+
+      :root {
+        --mudah: #16a34a;
+        --sedang: #d97706;
+        --susah: #dc2626;
+        --bg: #0f172a;
+        --card-w: 8.5cm;
+        --card-h: 5.5cm;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      /* ── SCREEN UI ── */
+      body {
+        font-family: "Nunito", sans-serif;
+        background: var(--bg);
+        color: #f1f5f9;
+        min-height: 100vh;
+      }
+
+      .screen-ui {
+        padding: 2rem;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .hero {
+        text-align: center;
+        padding: 2.5rem 0 2rem;
+      }
+      .hero h1 {
+        font-size: 2.4rem;
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+      }
+      .hero h1 span {
+        color: #f59e0b;
+      }
+      .hero p {
+        color: #94a3b8;
+        margin-top: 0.5rem;
+        font-size: 1rem;
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+        margin: 1.5rem 0;
+      }
+
+      .btn {
+        font-family: "Space Mono", monospace;
+        font-size: 0.85rem;
+        font-weight: 700;
+        padding: 0.65rem 1.4rem;
+        border-radius: 8px;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.15s;
+        letter-spacing: 0.02em;
+      }
+      .btn-primary {
+        background: #f59e0b;
+        color: #0f172a;
+      }
+      .btn-primary:hover {
+        background: #fbbf24;
+      }
+      .btn-secondary {
+        background: transparent;
+        border-color: #475569;
+        color: #cbd5e1;
+      }
+      .btn-secondary:hover {
+        border-color: #f59e0b;
+        color: #f59e0b;
+      }
+      .btn-danger {
+        background: transparent;
+        border-color: #dc2626;
+        color: #fca5a5;
+      }
+      .btn-danger:hover {
+        background: #dc2626;
+        color: #fff;
+      }
+
+      .filter-bar {
+        display: flex;
+        gap: 0.6rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+      }
+      .filter-btn {
+        font-family: "Space Mono", monospace;
+        font-size: 0.78rem;
+        font-weight: 700;
+        padding: 0.4rem 1rem;
+        border-radius: 999px;
+        border: 2px solid;
+        cursor: pointer;
+        transition: all 0.15s;
+        background: transparent;
+      }
+      .filter-btn.all {
+        border-color: #64748b;
+        color: #94a3b8;
+      }
+      .filter-btn.mudah {
+        border-color: var(--mudah);
+        color: #86efac;
+      }
+      .filter-btn.sedang {
+        border-color: var(--sedang);
+        color: #fcd34d;
+      }
+      .filter-btn.susah {
+        border-color: var(--susah);
+        color: #fca5a5;
+      }
+      .filter-btn.active,
+      .filter-btn:hover {
+        filter: brightness(1.3);
+      }
+      .filter-btn.all.active {
+        background: #334155;
+        color: #f1f5f9;
+      }
+      .filter-btn.mudah.active {
+        background: #14532d;
+      }
+      .filter-btn.sedang.active {
+        background: #78350f;
+      }
+      .filter-btn.susah.active {
+        background: #7f1d1d;
+      }
+
+      .stats {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+      }
+      .stat-pill {
+        font-family: "Space Mono", monospace;
+        font-size: 0.8rem;
+        background: #1e293b;
+        border-radius: 999px;
+        padding: 0.35rem 1rem;
+        color: #94a3b8;
+      }
+      .stat-pill b {
+        color: #f1f5f9;
+      }
+
+      /* ── PRINT LAYOUT ── */
+      @media print {
+        body {
+          background: white;
+        }
+        .screen-ui > *:not(.print-area) {
+          display: none !important;
+        }
+        .print-area {
+          display: block !important;
+        }
+        .print-area .page-break {
+          page-break-after: always;
+        }
+      }
+
+      .print-area {
+        display: none;
+      }
+
+      /* ── CARD GRID (preview) ── */
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, var(--card-w));
+        gap: 1rem;
+        justify-content: center;
+        padding-bottom: 3rem;
+      }
+
+      /* ── CARD ── */
+      .card {
+        width: var(--card-w);
+        height: var(--card-h);
+        border-radius: 10px;
+        background: #1e293b;
+        border: 1.5px solid #334155;
+        padding: 0.75rem 0.9rem 0.65rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.15s,
+          box-shadow 0.15s;
+        cursor: default;
+      }
+      .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      }
+
+      .card-corner {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 42px;
+        height: 42px;
+        border-radius: 0 10px 0 42px;
+      }
+      .card.mudah .card-corner {
+        background: var(--mudah);
+      }
+      .card.sedang .card-corner {
+        background: var(--sedang);
+      }
+      .card.susah .card-corner {
+        background: var(--susah);
+      }
+
+      .card-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .card-num {
+        font-family: "Space Mono", monospace;
+        font-size: 0.7rem;
+        color: #64748b;
+        font-weight: 700;
+      }
+      .level-badge {
+        font-family: "Space Mono", monospace;
+        font-size: 0.62rem;
+        font-weight: 700;
+        padding: 0.18rem 0.55rem;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .mudah .level-badge {
+        background: #14532d;
+        color: #86efac;
+      }
+      .sedang .level-badge {
+        background: #78350f;
+        color: #fcd34d;
+      }
+      .susah .level-badge {
+        background: #7f1d1d;
+        color: #fca5a5;
+      }
+
+      .category-tag {
+        font-family: "Space Mono", monospace;
+        font-size: 0.6rem;
+        color: #475569;
+        margin-left: auto;
+        padding-right: 2.2rem;
+      }
+
+      .card-question {
+        font-family: "Nunito", sans-serif;
+        font-size: 0.88rem;
+        font-weight: 800;
+        color: #f1f5f9;
+        line-height: 1.35;
+        flex: 1;
+        display: flex;
+        align-items: center;
+      }
+
+      .answer-toggle {
+        font-family: "Space Mono", monospace;
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 0.28rem 0.7rem;
+        border-radius: 5px;
+        background: #0f172a;
+        border: 1.5px solid #334155;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.15s;
+        align-self: flex-end;
+      }
+      .answer-toggle:hover {
+        border-color: #f59e0b;
+        color: #f59e0b;
+      }
+
+      .card-answer {
+        font-family: "Space Mono", monospace;
+        font-size: 0.75rem;
+        color: #fbbf24;
+        font-weight: 700;
+        background: #0f172a;
+        border-radius: 5px;
+        padding: 0.35rem 0.6rem;
+        display: none;
+        border-left: 3px solid #f59e0b;
+      }
+      .card-answer.show {
+        display: block;
+      }
+
+      /* ── PRINT CARDS ── */
+      .print-page {
+        display: grid;
+        grid-template-columns: repeat(2, var(--card-w));
+        grid-template-rows: repeat(4, var(--card-h));
+        gap: 0.5cm;
+        padding: 1cm;
+        width: 21cm;
+        justify-content: center;
+      }
+
+      .print-card {
+        width: var(--card-w);
+        height: var(--card-h);
+        border: 2px dashed #aaa;
+        border-radius: 8px;
+        padding: 0.6rem 0.8rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+        position: relative;
+        overflow: hidden;
+        background: #fff;
+        color: #111;
+        page-break-inside: avoid;
+        font-family: "Nunito", sans-serif;
+      }
+
+      .print-card .pc-corner {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 36px;
+        height: 36px;
+        border-radius: 0 8px 0 36px;
+      }
+      .print-card.mudah .pc-corner {
+        background: #16a34a;
+      }
+      .print-card.sedang .pc-corner {
+        background: #d97706;
+      }
+      .print-card.susah .pc-corner {
+        background: #dc2626;
+      }
+
+      .pc-meta {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .pc-num {
+        font-family: "Space Mono", monospace;
+        font-size: 0.65rem;
+        color: #666;
+        font-weight: 700;
+      }
+
+      .pc-badge {
+        font-family: "Space Mono", monospace;
+        font-size: 0.58rem;
+        font-weight: 700;
+        padding: 0.15rem 0.45rem;
+        border-radius: 3px;
+        text-transform: uppercase;
+      }
+      .print-card.mudah .pc-badge {
+        background: #dcfce7;
+        color: #15803d;
+      }
+      .print-card.sedang .pc-badge {
+        background: #fef3c7;
+        color: #b45309;
+      }
+      .print-card.susah .pc-badge {
+        background: #fee2e2;
+        color: #b91c1c;
+      }
+
+      .pc-cat {
+        font-family: "Space Mono", monospace;
+        font-size: 0.58rem;
+        color: #999;
+        margin-left: auto;
+        padding-right: 2rem;
+      }
+
+      .pc-divider {
+        height: 1px;
+        background: #e5e7eb;
+      }
+
+      .pc-question {
+        font-size: 0.85rem;
+        font-weight: 800;
+        color: #1e293b;
+        line-height: 1.3;
+        flex: 1;
+        display: flex;
+        align-items: center;
+      }
+
+      .pc-answer-label {
+        font-family: "Space Mono", monospace;
+        font-size: 0.6rem;
+        color: #aaa;
+      }
+      .pc-answer {
+        font-family: "Space Mono", monospace;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: #1e293b;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 4px;
+        padding: 0.25rem 0.5rem;
+        border-left: 3px solid #f59e0b;
+      }
+
+      .pc-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: auto;
+      }
+      .pc-logo {
+        font-family: "Space Mono", monospace;
+        font-size: 0.58rem;
+        color: #cbd5e1;
+        font-weight: 700;
+      }
+
+      /* hide answer on question-side cards */
+      .print-card.hide-answer .pc-answer-label,
+      .print-card.hide-answer .pc-answer {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="screen-ui">
+      <div class="hero">
+        <h1>Kartu Soal <span>Dicoding</span> Community</h1>
+        <p>35 soal logika & aritmatika · siap cetak & tempel kardus</p>
+      </div>
+
+      <div class="stats">
+        <div class="stat-pill">Total: <b id="stat-total">35</b> soal</div>
+        <div class="stat-pill">Mudah: <b style="color: #86efac">12</b></div>
+        <div class="stat-pill">Sedang: <b style="color: #fcd34d">15</b></div>
+        <div class="stat-pill">Susah: <b style="color: #fca5a5">8</b></div>
+      </div>
+
+      <div class="filter-bar">
+        <button
+          class="filter-btn all active"
+          onclick="filterCards('all', this)"
+        >
+          Semua
+        </button>
+        <button class="filter-btn mudah" onclick="filterCards('mudah', this)">
+          🟢 Mudah
+        </button>
+        <button class="filter-btn sedang" onclick="filterCards('sedang', this)">
+          🟡 Sedang
+        </button>
+        <button class="filter-btn susah" onclick="filterCards('susah', this)">
+          🔴 Susah
+        </button>
+      </div>
+
+      <div class="controls">
+        <button class="btn btn-secondary" onclick="toggleAllAnswers()">
+          👁 Tampilkan/Sembunyikan Jawaban
+        </button>
+        <button class="btn btn-secondary" onclick="shuffleCards()">
+          🔀 Acak Urutan
+        </button>
+        <button class="btn btn-primary" onclick="printCards()">
+          🖨 Cetak Kartu Soal
+        </button>
+        <button class="btn btn-danger" onclick="printAnswerKey()">
+          📋 Cetak Kunci Jawaban
+        </button>
+      </div>
+
+      <div class="card-grid" id="cardGrid"></div>
+    </div>
+
+    <!-- Print area injected by JS -->
+    <div class="print-area" id="printArea"></div>
+
+    <script>
+      const soal = [
+        // ── MUDAH (12) ──
+        {
+          id: 1,
+          level: "mudah",
+          cat: "Aritmatika",
+          q: "Berapa hasil dari 15 × 4 ÷ 6?",
+          a: "10",
+        },
+        {
+          id: 2,
+          level: "mudah",
+          cat: "Aritmatika",
+          q: "Jika x = 7, berapa nilai 3x + 5?",
+          a: "26",
+        },
+        {
+          id: 3,
+          level: "mudah",
+          cat: "Aritmatika",
+          q: "Berapakah FPB dari 12 dan 18?",
+          a: "6",
+        },
+        {
+          id: 4,
+          level: "mudah",
+          cat: "Aritmatika",
+          q: "Berapakah KPK dari 4 dan 6?",
+          a: "12",
+        },
+        {
+          id: 5,
+          level: "mudah",
+          cat: "Logika",
+          q: "Jika semua kucing adalah hewan, dan Milo adalah kucing — apakah Milo adalah hewan?",
+          a: "Ya",
+        },
+        {
+          id: 6,
+          level: "mudah",
+          cat: "Pola",
+          q: "Lanjutkan pola: 2, 4, 8, 16, __",
+          a: "32",
+        },
+        {
+          id: 7,
+          level: "mudah",
+          cat: "Pola",
+          q: "Lanjutkan pola: 1, 3, 6, 10, __",
+          a: "15",
+        },
+        {
+          id: 8,
+          level: "mudah",
+          cat: "Aritmatika",
+          q: "Berapa persen dari 50 adalah 10?",
+          a: "20%",
+        },
+        {
+          id: 9,
+          level: "mudah",
+          cat: "Logika",
+          q: "TRUE AND FALSE hasilnya apa?",
+          a: "FALSE",
+        },
+        {
+          id: 10,
+          level: "mudah",
+          cat: "Logika",
+          q: "TRUE OR FALSE hasilnya apa?",
+          a: "TRUE",
+        },
+        {
+          id: 11,
+          level: "mudah",
+          cat: "Aritmatika",
+          q: "Rata-rata dari 4, 8, 10, dan 6 adalah?",
+          a: "7",
+        },
+        {
+          id: 12,
+          level: "mudah",
+          cat: "Pola",
+          q: "Lanjutkan: 100, 50, 25, __",
+          a: "12.5",
+        },
+
+        // ── SEDANG (15) ──
+        {
+          id: 13,
+          level: "sedang",
+          cat: "Logika",
+          q: "NOT (TRUE AND FALSE) hasilnya apa?",
+          a: "TRUE",
+        },
+        {
+          id: 14,
+          level: "sedang",
+          cat: "Aritmatika",
+          q: "Jika 20% dari x = 50, berapakah x?",
+          a: "250",
+        },
+        {
+          id: 15,
+          level: "sedang",
+          cat: "Logika",
+          q: "for i in range(3): print(i) — angka apa saja yang dicetak?",
+          a: "0, 1, 2",
+        },
+        {
+          id: 16,
+          level: "sedang",
+          cat: "Pola",
+          q: "Pola: 1, 1, 2, 3, 5, 8, __ — lanjutkan!",
+          a: "13",
+        },
+        {
+          id: 17,
+          level: "sedang",
+          cat: "Aritmatika",
+          q: "Sebuah persegi panjang 12cm × 7cm. Berapakah kelilingnya?",
+          a: "38 cm",
+        },
+        {
+          id: 18,
+          level: "sedang",
+          cat: "Logika",
+          q: "x = 10; if x > 5 and x < 20: print('yes') — apakah 'yes' tercetak?",
+          a: "Ya, tercetak",
+        },
+        {
+          id: 19,
+          level: "sedang",
+          cat: "Aritmatika",
+          q: "Jika sebuah toko diskon 30%, harga asal Rp80.000 — harga setelah diskon?",
+          a: "Rp56.000",
+        },
+        {
+          id: 20,
+          level: "sedang",
+          cat: "Logika",
+          q: "arr = [3, 1, 4, 1, 5]. Berapa nilai arr[2]?",
+          a: "4",
+        },
+        {
+          id: 21,
+          level: "sedang",
+          cat: "Pola",
+          q: "Lanjutkan pola: 3, 6, 12, 24, 48, __",
+          a: "96",
+        },
+        {
+          id: 22,
+          level: "sedang",
+          cat: "Aritmatika",
+          q: "Berapakah 7² + 24²?",
+          a: "625 (= 25²)",
+        },
+        {
+          id: 23,
+          level: "sedang",
+          cat: "Logika",
+          q: "Fungsi dipanggil: def f(n): return n*2+1 — f(4) = ?",
+          a: "9",
+        },
+        {
+          id: 24,
+          level: "sedang",
+          cat: "Aritmatika",
+          q: "Kecepatan 60 km/jam — berapa waktu untuk 150 km?",
+          a: "2.5 jam",
+        },
+        {
+          id: 25,
+          level: "sedang",
+          cat: "Logika",
+          q: "x = 5; while x > 0: x -= 2 — nilai x terakhir sebelum loop berhenti?",
+          a: "-1",
+        },
+        {
+          id: 26,
+          level: "sedang",
+          cat: "Pola",
+          q: "Pola: 2, 5, 11, 23, 47, __ — lanjutkan!",
+          a: "95  (× 2 + 1)",
+        },
+        {
+          id: 27,
+          level: "sedang",
+          cat: "Aritmatika",
+          q: "Berapa sisa bagi (modulo) dari 47 ÷ 5?",
+          a: "2",
+        },
+
+        // ── SUSAH (8) ──
+        {
+          id: 28,
+          level: "susah",
+          cat: "Logika",
+          q: "Fungsi rekursif: def f(n): return 1 if n<=1 else n*f(n-1) — f(5) = ?",
+          a: "120",
+        },
+        {
+          id: 29,
+          level: "susah",
+          cat: "Aritmatika",
+          q: "log₂(64) = ?",
+          a: "6",
+        },
+        {
+          id: 30,
+          level: "susah",
+          cat: "Logika",
+          q: "Dua gelas berisi 3L dan 5L (tidak ada ukuran lain). Bagaimana mendapatkan tepat 4L?",
+          a: "Isi 5L → tuang ke 3L → sisa 2L di 5L → kosongkan 3L → tuang 2L ke 3L → isi 5L lagi → tuang ke 3L sampai penuh → sisa 4L",
+        },
+        {
+          id: 31,
+          level: "susah",
+          cat: "Pola",
+          q: "Barisan: aₙ = 3n² − 2n + 1. Berapa a₅?",
+          a: "66",
+        },
+        {
+          id: 32,
+          level: "susah",
+          cat: "Aritmatika",
+          q: "Uang Rp1.000.000 diinvestasikan 2 tahun bunga majemuk 10% per tahun. Hasilnya?",
+          a: "Rp1.210.000",
+        },
+        {
+          id: 33,
+          level: "susah",
+          cat: "Logika",
+          q: "Sebuah kode biner: 1010 1100 — berapa nilai desimalnya?",
+          a: "172",
+        },
+        {
+          id: 34,
+          level: "susah",
+          cat: "Logika",
+          q: "Big-O: loop dalam loop (nested for) atas array n elemen — kompleksitasnya?",
+          a: "O(n²)",
+        },
+        {
+          id: 35,
+          level: "susah",
+          cat: "Aritmatika",
+          q: "Berapa banyak bilangan prima antara 1 sampai 30?",
+          a: "10  (2,3,5,7,11,13,17,19,23,29)",
+        },
+      ];
+
+      let currentFilter = "all";
+      let answersVisible = false;
+
+      function getLevelColor(level) {
+        return { mudah: "#16a34a", sedang: "#d97706", susah: "#dc2626" }[level];
+      }
+
+      function buildCard(s) {
+        const div = document.createElement("div");
+        div.className = `card ${s.level}`;
+        div.dataset.level = s.level;
+        div.innerHTML = `
+    <div class="card-meta">
+      <span class="card-num">#${String(s.id).padStart(2, "0")}</span>
+    </div>
+    <div class="card-question">${s.q}</div>
+    <button class="answer-toggle" onclick="toggleAnswer(this)">lihat jawaban ▾</button>
+    <div class="card-answer">✓ ${s.a}</div>
+  `;
+        return div;
+      }
+
+      function renderCards(data) {
+        const grid = document.getElementById("cardGrid");
+        grid.innerHTML = "";
+        data.forEach((s) => grid.appendChild(buildCard(s)));
+        document.getElementById("stat-total").textContent = data.length;
+      }
+
+      function filterCards(level, btn) {
+        currentFilter = level;
+        document
+          .querySelectorAll(".filter-btn")
+          .forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const filtered =
+          level === "all" ? soal : soal.filter((s) => s.level === level);
+        renderCards(filtered);
+      }
+
+      function toggleAnswer(btn) {
+        const ans = btn.nextElementSibling;
+        ans.classList.toggle("show");
+        btn.textContent = ans.classList.contains("show")
+          ? "sembunyikan ▴"
+          : "lihat jawaban ▾";
+      }
+
+      function toggleAllAnswers() {
+        answersVisible = !answersVisible;
+        document.querySelectorAll(".card-answer").forEach((el) => {
+          el.classList.toggle("show", answersVisible);
+        });
+        document.querySelectorAll(".answer-toggle").forEach((btn) => {
+          btn.textContent = answersVisible
+            ? "sembunyikan ▴"
+            : "lihat jawaban ▾";
+        });
+      }
+
+      function shuffleCards() {
+        const arr = [...soal].sort(() => Math.random() - 0.5);
+        renderCards(arr);
+      }
+
+      // ── PRINT ──
+      function buildPrintCard(s, hideAnswer) {
+        return `
+  <div class="print-card ${s.level} ${hideAnswer ? "hide-answer" : ""}">
+    <div class="pc-meta">
+      <span class="pc-num">#${String(s.id).padStart(2, "0")}</span>
+    </div>
+    <div class="pc-divider"></div>
+    <div class="pc-question">${s.q}</div>
+    <div class="pc-answer-label">Jawaban:</div>
+    <div class="pc-answer">${s.a}</div>
+    <div class="pc-footer">
+      <span class="pc-logo">DICODING COMMUNITY UIN RADEN FATAH</span>
+    </div>
+  </div>`;
+      }
+
+      function buildPrintArea(data, hideAnswer) {
+        const perPage = 8; // 2 col × 4 row on A4
+        let html = "";
+        for (let i = 0; i < data.length; i += perPage) {
+          const chunk = data.slice(i, i + perPage);
+          html += `<div class="print-page">`;
+          chunk.forEach((s) => {
+            html += buildPrintCard(s, hideAnswer);
+          });
+          // pad empty slots
+          const empty = perPage - chunk.length;
+          for (let e = 0; e < empty; e++)
+            html += `<div class="print-card" style="border:2px dashed #e5e7eb;background:#fafafa;"></div>`;
+          html += `</div>`;
+          if (i + perPage < data.length)
+            html += `<div class="page-break"></div>`;
+        }
+        return html;
+      }
+
+      function printCards() {
+        const printArea = document.getElementById("printArea");
+        const data =
+          currentFilter === "all"
+            ? soal
+            : soal.filter((s) => s.level === currentFilter);
+        printArea.innerHTML = buildPrintArea(data, true); // hide answer on question cards
+        window.print();
+      }
+
+      function printAnswerKey() {
+        const printArea = document.getElementById("printArea");
+        const data =
+          currentFilter === "all"
+            ? soal
+            : soal.filter((s) => s.level === currentFilter);
+        printArea.innerHTML = buildPrintArea(data, false); // show answer
+        window.print();
+      }
+
+      // init
+      renderCards(soal);
+    </script>
+  </body>
+</html>
